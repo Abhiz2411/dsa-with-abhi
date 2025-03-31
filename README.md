@@ -32,6 +32,11 @@ Each topic will have its own directory 📂 with:
 - Code Solutions
 - Learnings & Mistakes
 
+## How to compile and run the program
+Since the programs are declared as a package it must be compiled and run in below format
+- compile: javac package_name/file_name.java
+- run: java package_name.file_name
+
 ## Motivation 🚨
 I'm not the best at DSA (yet), but I'm **becoming better every single day 🔥**.
 
