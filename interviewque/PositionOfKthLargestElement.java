@@ -2,6 +2,7 @@
 // Input:
 // 1. Unsorted array
 // 2. K: integer representing rank of highest element in the array
+// Output: Return the index of Kth highest element from the original unsorted array
 
 package interviewque;
 
