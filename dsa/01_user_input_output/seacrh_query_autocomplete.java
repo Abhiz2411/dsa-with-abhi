@@ -85,8 +85,149 @@
     The length of each sentence including those in the historical data and query data won't exceed 102.
 
 */
-class seacrh_query_autocomplete {
-    public static void main(String[] args){
+
+//{ Driver Code Starts
+// Initial Template for Java
+
+import java.io.*;
+import java.util.*;
+
+class GFG {
+    static class FastReader {
+        BufferedReader br;
+        StringTokenizer st;
+
+        public FastReader() {
+            br = new BufferedReader(new InputStreamReader(System.in));
+        }
+
+        String next() {
+            while (st == null || !st.hasMoreElements()) {
+                try {
+                    st = new StringTokenizer(br.readLine());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            return st.nextToken();
+        }
+
+        String nextLine() {
+            String str = "";
+            try {
+                str = br.readLine();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return str;
+        }
+
+        Integer nextInt() { return Integer.parseInt(next()); }
+    }
+
+    public static void main(String[] args) throws IOException {
+        FastReader sc = new FastReader();
+        PrintWriter out = new PrintWriter(System.out);
+        int t = sc.nextInt();
+        while (t-- > 0) {
+            int n = sc.nextInt();
+            String sentences[] = new String[n];
+            int times[] = new int[n];
+            for (int i = 0; i < n; i++) {
+                sentences[i] = sc.nextLine();
+                times[i] = sc.nextInt();
+            }
+            AutoCompleteSystem obj = new AutoCompleteSystem(sentences, times);
+            int q = sc.nextInt();
+            for (int i = 0; i < q; i++) {
+                String query = sc.nextLine();
+                StringBuilder qq = new StringBuilder();
+                for (int j = 0; j < query.length(); j++) {
+                    char x = query.charAt(j);
+                    qq.append(String.valueOf(x));
+                    ArrayList<String> suggestions = obj.input(x);
+                    if (x == '#') continue;
+                    out.print("Typed : \"" + qq.toString() + "\" , Suggestions: \n");
+                    for (String y : suggestions) out.print(y + "\n");
+                }
+            }
+        }
+        out.flush();
+    }
+}
+// } Driver Code Ends
+
+
+// User function Template for Java
+
+class AutoCompleteSystem {
+    class TrieNode {
+        Map<Character, TrieNode> children;
+        Map<String, Integer> frequencyMap;
+        boolean isEndOfWord;
         
+        TrieNode() {
+            children = new HashMap<>();
+            frequencyMap = new HashMap<>();
+            isEndOfWord = false;
+        }
+    }
+
+    private TrieNode root;
+    private StringBuilder currentInput;
+    
+    public AutoCompleteSystem(String sentences[], int times[]) {
+        root = new TrieNode();
+        currentInput = new StringBuilder();
+        
+        // Insert all given sentences into the Trie
+        for (int i = 0; i < sentences.length; i++) {
+            insert(sentences[i], times[i]);
+        }
+    }
+
+    private void insert(String sentence, int count) {
+        TrieNode node = root;
+        
+        for (char c : sentence.toCharArray()) {
+            node.children.putIfAbsent(c, new TrieNode());
+            node = node.children.get(c);
+            node.frequencyMap.put(sentence, node.frequencyMap.getOrDefault(sentence, 0) + count);
+        }
+        node.isEndOfWord = true;
+    }
+    
+    ArrayList<String> input(char c) {
+        if (c == '#') {
+            // When '#' is entered, store the current query in the Trie
+            insert(currentInput.toString(), 1);
+            currentInput.setLength(0); // Reset input
+            return new ArrayList<>();
+        }
+
+        currentInput.append(c);
+        TrieNode node = root;
+        
+        for (char ch : currentInput.toString().toCharArray()) {
+            if (!node.children.containsKey(ch)) {
+                return new ArrayList<>(); // No matches found
+            }
+            node = node.children.get(ch);
+        }
+
+        // Get top results based on frequency & lexicographical order
+        PriorityQueue<Map.Entry<String, Integer>> pq = new PriorityQueue<>(
+            (a, b) -> a.getValue().equals(b.getValue()) ? a.getKey().compareTo(b.getKey()) : b.getValue() - a.getValue()
+        );
+
+        pq.addAll(node.frequencyMap.entrySet());
+
+        ArrayList<String> results = new ArrayList<>();
+        int count = 3; // Limit to top 3 suggestions
+        while (!pq.isEmpty() && count-- > 0) {
+            results.add(pq.poll().getKey());
+        }
+
+        return results;
     }
 }
