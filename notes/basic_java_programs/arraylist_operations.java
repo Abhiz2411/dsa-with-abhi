@@ -15,6 +15,9 @@ public class arraylist_operations {
         
         // Printing elements of fruits
         System.out.println("Fruits: "+fruits);
+
+        // Getting element from al fruits using get method
+        System.out.println("\nElement at index 2: "+fruits.get(2));
         
         // Adding element using index
         fruits.add(2,"Pineapple");
